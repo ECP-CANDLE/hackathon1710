@@ -1,0 +1,17 @@
+# Modify setup.py
+
+# Compile hovorod
+
+  995  cd horovod-0.9.6/
+  997  source activate horovod-tfi
+  998  CC=icc CXX=icpc LD=cc\ -Wl,-rpath=/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64 CCSHARED=cc HOROVOD_CPU_ALLRE
+DUCE=MPI HOROVOD_CPU_ALLGATHER=MPI HOROVOD_CPU_BROADCAST=MPI LDSHARED=CC\ -Wl,-Bdynamic\ -shared\ -Wl,-rpath=/opt/intel/compilers_and_libraries
+_2018.0.128/linux/compiler/lib/intel64 python mpich-setup.py install
+
+
+# To actually run a test (last step)
+
+  994  qsub -I -t 1:00:00 -n 8 -A datascience
+  983  source activate horovod-tfi
+  984  export LD_LIBRARY_PATH=/home/pbalapra/.conda/envs/horovod-tfi/lib:${LD_LIBRARY_PATH}
+  985  aprun -N 1 -n 8 -b python debug.py

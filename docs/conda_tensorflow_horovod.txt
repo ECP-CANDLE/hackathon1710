@@ -1,0 +1,52 @@
+# General steps:
+# 1. create a python-intel environment to build tensorflow in
+# 2. build tensorflow
+# 3. create a tensorflow/horovod environment
+# 4. test the new environment
+
+
+# 1. create a python-intel environment to build tensorflow in
+
+conda create -n intel-python2 -c intel intelpython2_core python=2
+source activate intel-python2
+
+
+# 2. build tensorflow
+
+export PATH=/home/brettin/bazel-0.4.5/output:$PATH
+module load java
+modiule load gcc
+
+tar -xvf v1.3.1.tar
+pushd tensorflow-1.3.1/
+./configure
+bazel build --config=mkl --copt=-DEIGEN_USE_VML -c opt //tensorflow/tools/pip_package:build_pip_package
+bazel-bin/tensorflow/tools/pip_package/build_pip_package /home/brettin/tensorflow_mpi/intel-tensorflow-1.3.1_eigen
+popd
+
+source deactivate
+
+
+# 3. create a tensorflow/horovod environment
+
+conda create -n tensorflow-v1.3_horovod-v0.9.6 -c intel intelpython2_core python=2
+source activate tensorflow-v1.3_horovod-v0.9.6
+conda install keras
+pip install /home/brettin/tensorflow_mpi/tensorflow-1.3.1_eigen/tensorflow-1.3.1-cp27-cp27mu-linux_x86_64.whl
+conda install -c intel scikit-learn
+conda install --no-update-deps readline
+conda install --no-update-deps future
+# This needs work, Prasanna is working on it.
+# pip install horovod
+
+source deactivate tensorflow-v1.3_horovod-v0.9.6
+
+
+# 4. test the new environment
+qsub -I -n 1 -t 100 -A Candle_ECP
+source activate tensorflow-v1.3_horovod-v0.9.6
+cd ~/local/studies/
+qsub qsub_test.sh
+
+
+
