@@ -1,0 +1,39 @@
+
+# create a python-intel envoronment to build horovod in
+conda create -y -n tf-1.3.0_eigen_hv-0.9.6 -c intel intelpython2_core python=2
+source activate tf-1.3.0_eigen_hv-0.9.6
+conda install -y -c intel scikit-learn
+conda install -y  backports=1.0
+conda install -y  backports.weakref=1.0rc1
+conda install -y  bleach=1.5.0
+conda install -y  funcsigs=1.0.2
+conda install -y  h5py=2.7.0
+conda install -y  libgpuarray=0.6.9
+conda install -y  libprotobuf=3.4.0
+conda install -y  mako=1.0.6
+conda install -y  markdown=2.6.9
+conda install -y  mkl-service=1.1.2
+conda install -y  mock=2.0.0
+conda install -y  nose=1.3.7
+conda install -y  protobuf=3.4.0
+conda install -y  pygpu=0.6.9
+conda install -y  tensorflow-base=1.3.0
+conda install -y  tensorflow-tensorboard=0.1.5
+conda install -y  theano=0.9.0
+conda install -y  werkzeug=0.12.2
+conda install -y --no-deps keras=2.0.5
+
+
+# install optimized tensorflow from intel
+wget https://anaconda.org/intel/tensorflow/1.3.0/download/tensorflow-1.3.0-cp27-cp27mu-linux_x86_64.whl
+pip install tensorflow-1.3.0-cp27-cp27mu-linux_x86_64.whl
+
+
+# install horovod
+git clone https://github.com/brettin/horovod
+pushd horovod
+CC=icc CXX=icpc LD=cc\ -Wl,-rpath=/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64 CCSHARED=cc HOROVOD_CPU_ALLREDUCE=MPI HOROVOD_CPU_ALLGATHER=MPI HOROVOD_CPU_BROADCAST=MPI LDSHARED=CC\ -Wl,-Bdynamic\ -shared\ -Wl,-rpath=/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64 python mpich-setup.py install
+
+# run a test
+
+
