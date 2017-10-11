@@ -1,17 +1,25 @@
-# Modify setup.py
+#!/bin/bash
+
+set -e
+set -x
+
+# Modified setup.py can be found in github.com/brettin/horovod
+# The modified setyp.py is named mpich-setup.py
+
+
+# Activate a conda environment with the tensorflow that you want
+# to use already installed.
+
+source activate tf-1.3.0_eigen_hv-0.9.6
 
 # Compile hovorod
+git clone https://github.com/brettin/horovod
+pushd horovod
 
-  995  cd horovod-0.9.6/
-  997  source activate horovod-tfi
-  998  CC=icc CXX=icpc LD=cc\ -Wl,-rpath=/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64 CCSHARED=cc HOROVOD_CPU_ALLRE
-DUCE=MPI HOROVOD_CPU_ALLGATHER=MPI HOROVOD_CPU_BROADCAST=MPI LDSHARED=CC\ -Wl,-Bdynamic\ -shared\ -Wl,-rpath=/opt/intel/compilers_and_libraries
-_2018.0.128/linux/compiler/lib/intel64 python mpich-setup.py install
+CC=icc CXX=icpc LD=cc\ -Wl,-rpath=/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64 CCSHARED=cc HOROVOD_CPU_ALLREDUCE=MPI HOROVOD_CPU_ALLGATHER=MPI HOROVOD_CPU_BROADCAST=MPI LDSHARED=CC\ -Wl,-Bdynamic\ -shared\ -Wl,-rpath=/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64 python mpich-setup.py install
 
+popd
+source deactivate
 
-# To actually run a test (last step)
-
-  994  qsub -I -t 1:00:00 -n 8 -A datascience
-  983  source activate horovod-tfi
-  984  export LD_LIBRARY_PATH=/home/pbalapra/.conda/envs/horovod-tfi/lib:${LD_LIBRARY_PATH}
-  985  aprun -N 1 -n 8 -b python debug.py
+# Running a test
+# qsub horovod/examples/debug.sh 
